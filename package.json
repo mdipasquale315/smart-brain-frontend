@@ -6,7 +6,7 @@
     "particles-bg": "^2.5.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-parallax-tilt": "^1.7.237",
+    "react-parallax-tilt": "^1.7.308",
     "react-scripts": "^5.0.1",
     "tachyons": "^4.12.0"
   },
