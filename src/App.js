@@ -13,7 +13,7 @@ import './App.css';
 const initialState = {
   input: '',
   imageUrl: '',
-  box: {},
+  boxes: [], // Changed to array to hold multiple boxes
   route: 'signin',
   isSignedIn: false,
   user: {
@@ -24,7 +24,6 @@ const initialState = {
     joined: ''
   }
 }
-
 
 class App extends Component {
   constructor() {
@@ -42,44 +41,53 @@ class App extends Component {
     }})
   }
 
-  calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+  // Updated to handle multiple face boxes
+  calculateFaceLocations = (data) => {
+    const regions = data.outputs[0]?.data?.regions;
+    if (!regions || regions.length === 0) {
+      return [];
+    }
+
     const image = document.getElementById('inputimage');
     const width = Number(image.width);
     const height = Number(image.height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
-    }
+
+    return regions.map(region => {
+      const clarifaiFace = region.region_info.bounding_box;
+      return {
+        leftCol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_row * height,
+        rightCol: clarifaiFace.right_col * width,
+        bottomRow: clarifaiFace.bottom_row * height
+      };
+    });
   }
 
-  displayFaceBox = (box) => {
-    this.setState({box: box});
+  displayFaceBoxes = (boxes) => {
+    this.setState({ boxes: boxes });
   }
 
   onInputChange = (event) => {
-    this.setState({input: event.target.value});
+    this.setState({ input: event.target.value });
   }
 
- // In your component
-onButtonSubmit = () => {
-  fetch('https://smart-brain-backend-l6cv.onrender.com/imageurl', {
-    method: 'post',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ input: this.state.input }),
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.faceBoxes) {
-      this.displayFaceBoxes(this.calculateFaceLocations(data.faceBoxes));
-    } else {
-      this.setState({ boxes: [] }); // handle no faces detected
-    }
-  })
-  .catch(err => console.log(err));
-};
+  onButtonSubmit = () => {
+    this.setState({ imageUrl: this.state.input }); // set imageUrl to display image
+    fetch('https://smart-brain-backend-l6cv.onrender.com/imageurl', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: this.state.input }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.faceBoxes) {
+        this.displayFaceBoxes(this.calculateFaceLocations(data));
+      } else {
+        this.setState({ boxes: [] }); // no faces detected
+      }
+    })
+    .catch(err => console.log('Error:', err));
+  };
 
   onRouteChange = (route) => {
     if (route === 'signout') {
@@ -91,7 +99,7 @@ onButtonSubmit = () => {
   }
 
   render() {
-    const { isSignedIn, imageUrl, route, box } = this.state;
+    const { isSignedIn, imageUrl, route, boxes } = this.state;
     return (
       <div className="App">
         <ParticlesBg type="circle" bg={true} />
@@ -107,7 +115,7 @@ onButtonSubmit = () => {
                 onInputChange={this.onInputChange}
                 onButtonSubmit={this.onButtonSubmit}
               />
-              <FaceRecognition box={box} imageUrl={imageUrl} />
+              <FaceRecognition box={boxes} imageUrl={imageUrl} />
             </div>
           : (
              route === 'signin'
