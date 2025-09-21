@@ -63,6 +63,7 @@ class Signin extends React.Component {
                     id="email-address"
                     onChange={this.onEmailChange}
                     required
+                    autoComplete="email"
                   />
                 </div>
                 <div className="mv3">
@@ -79,6 +80,7 @@ class Signin extends React.Component {
                     id="password"
                     onChange={this.onPasswordChange}
                     required
+                    autoComplete="current-password"
                   />
                 </div>
                 {/* Submit button inside form */}
