@@ -13,8 +13,8 @@ import './App.css';
 const initialState = {
   input: '',
   imageUrl: '',
-  boxes: [], // Changed to array to hold multiple boxes
-  route: 'signin',
+  boxes: [], // multiple face boxes
+  route: 'signin', // default route
   isSignedIn: false,
   user: {
     id: '',
@@ -23,7 +23,7 @@ const initialState = {
     entries: 0,
     joined: ''
   }
-}
+};
 
 class App extends Component {
   constructor() {
@@ -32,21 +32,12 @@ class App extends Component {
   }
 
   loadUser = (data) => {
-    this.setState({user: {
-      id: data.id,
-      name: data.name,
-      email: data.email,
-      entries: data.entries,
-      joined: data.joined
-    }})
+    this.setState({ user: { ...data } });
   }
 
-  // Updated to handle multiple face boxes
   calculateFaceLocations = (data) => {
-    const regions = data.outputs[0]?.data?.regions;
-    if (!regions || regions.length === 0) {
-      return [];
-    }
+    const regions = data.outputs?.[0]?.data?.regions;
+    if (!regions || regions.length === 0) return [];
 
     const image = document.getElementById('inputimage');
     const width = Number(image.width);
@@ -61,29 +52,29 @@ class App extends Component {
         bottomRow: clarifaiFace.bottom_row * height
       };
     });
-  }
+  };
 
   displayFaceBoxes = (boxes) => {
-    this.setState({ boxes: boxes });
-  }
+    this.setState({ boxes });
+  };
 
   onInputChange = (event) => {
     this.setState({ input: event.target.value });
-  }
+  };
 
   onButtonSubmit = () => {
-    this.setState({ imageUrl: this.state.input }); // set imageUrl to display image
+    this.setState({ imageUrl: this.state.input });
     fetch('https://smart-brain-backend-l6cv.onrender.com/imageurl', {
-      method: 'post',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ input: this.state.input }),
     })
     .then(res => res.json())
     .then(data => {
-      if (data.faceBoxes) {
+      if (data && data.outputs) {
         this.displayFaceBoxes(this.calculateFaceLocations(data));
       } else {
-        this.setState({ boxes: [] }); // no faces detected
+        this.setState({ boxes: [] });
       }
     })
     .catch(err => console.log('Error:', err));
@@ -91,38 +82,31 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === 'signout') {
-      this.setState(initialState)
+      this.setState(initialState);
     } else if (route === 'home') {
-      this.setState({isSignedIn: true})
+      this.setState({ isSignedIn: true });
     }
-    this.setState({route: route});
-  }
+    this.setState({ route });
+  };
 
   render() {
-    const { isSignedIn, imageUrl, route, boxes } = this.state;
+    const { isSignedIn, imageUrl, route, boxes, user } = this.state;
     return (
       <div className="App">
         <ParticlesBg type="circle" bg={true} />
         <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
-        { route === 'home'
-          ? <div>
-              <Logo />
-              <Rank
-                name={this.state.user.name}
-                entries={this.state.user.entries}
-              />
-              <ImageLinkForm
-                onInputChange={this.onInputChange}
-                onButtonSubmit={this.onButtonSubmit}
-              />
-              <FaceRecognition box={boxes} imageUrl={imageUrl} />
-            </div>
-          : (
-             route === 'signin'
-             ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-             : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-            )
-        }
+        {route === 'home' ? (
+          <div>
+            <Logo />
+            <Rank name={user.name} entries={user.entries} />
+            <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+            <FaceRecognition box={boxes} imageUrl={imageUrl} />
+          </div>
+        ) : route === 'signin' ? (
+          <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+        ) : (
+          <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
+        )}
       </div>
     );
   }
