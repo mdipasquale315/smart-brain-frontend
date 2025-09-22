@@ -21,7 +21,7 @@ class Signin extends Component {
   onSubmitSignIn = (event) => {
     event.preventDefault(); // prevent page refresh
 
-    fetch('https://smart-brain-backend-l6cv.onrender.com/signin' {
+    fetch('https://smart-brain-backend-l6cv.onrender.com/signin', {
       method: 'POST'
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -31,7 +31,7 @@ class Signin extends Component {
     })
       .then(res => res.json())
       .then(user => {
-        if (user.id) {
+        if (user && user.id) {
           this.props.loadUser(user);
           this.props.onRouteChange('home');
           // Optional: clear inputs
