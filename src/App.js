@@ -45,7 +45,6 @@ class App extends Component {
   };
 
   calculateFaceLocation = (data) => {
-    // Safely handle response data
     if (
       !data.outputs ||
       !data.outputs[0] ||
