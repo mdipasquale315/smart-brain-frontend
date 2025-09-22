@@ -5,7 +5,8 @@ class Signin extends Component {
     super(props);
     this.state = {
       signInEmail: '',
-      signInPassword: ''
+      signInPassword: '',
+      errorMessage: '' // optional: for inline error display
     };
   }
 
@@ -33,13 +34,15 @@ class Signin extends Component {
         if (user.id) {
           this.props.loadUser(user);
           this.props.onRouteChange('home');
+          // Optional: clear inputs
+          this.setState({ signInEmail: '', signInPassword: '' });
         } else {
-          alert('Sign in failed');
+          this.setState({ errorMessage: 'Sign in failed. Please check your credentials.' });
         }
       })
       .catch(err => {
         console.log('Error:', err);
-        alert('Error signing in');
+        this.setState({ errorMessage: 'Error signing in. Please try again later.' });
       });
   };
 
@@ -62,6 +65,7 @@ class Signin extends Component {
                     name="email"
                     id="email-address"
                     onChange={this.onEmailChange}
+                    value={this.state.signInEmail}
                     required
                     autoComplete="email"
                   />
@@ -76,6 +80,7 @@ class Signin extends Component {
                     name="password"
                     id="password"
                     onChange={this.onPasswordChange}
+                    value={this.state.signInPassword}
                     required
                     autoComplete="current-password"
                   />
@@ -89,6 +94,9 @@ class Signin extends Component {
                   />
                 </div>
               </form>
+              {this.state.errorMessage && (
+                <p className="mt3 red">{this.state.errorMessage}</p>
+              )}
             </fieldset>
             <div className="lh-copy mt3">
               <p
