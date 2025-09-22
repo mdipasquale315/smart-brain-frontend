@@ -15,7 +15,7 @@ const initialState = {
   input: '',
   imageUrl: '',
   box: {},
-  route: 'signin', // start at signin
+  route: 'signin',
   isSignedIn: false,
   user: {
     id: '',
@@ -89,7 +89,7 @@ class App extends Component {
       .then(response => {
         console.log('API response:', response);
         const faceBox = this.calculateFaceLocation(response);
-        console.log('Face box:', faceBox);
+        console.log('Calculated face box:', faceBox);
         if (faceBox) {
           this.displayFaceBox(faceBox);
         } else {
@@ -103,13 +103,13 @@ class App extends Component {
         })
         .then(res => res.json())
         .then(count => {
-          console.log('Entries count:', count);
+          console.log('Updated entries:', count);
           this.setState({ user: { ...this.state.user, entries: count } });
         })
         .catch(err => console.log('Entries update error:', err));
       })
       .catch(err => {
-        console.log('Error in face detection call:', err);
+        console.log('Error:', err);
         this.displayFaceBox({});
       });
   };
