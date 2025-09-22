@@ -44,7 +44,7 @@ class App extends Component {
     });
   };
 
-  // Calculate face location with safety check
+  // Calculate face location with safety checks
   calculateFaceLocation = (data) => {
     if (
       !data.outputs ||
@@ -88,6 +88,7 @@ class App extends Component {
     })
       .then(res => res.json())
       .then(response => {
+        // Debug API response
         console.log('API response:', response);
         const faceBox = this.calculateFaceLocation(response);
         console.log('Face box:', faceBox);
@@ -95,10 +96,9 @@ class App extends Component {
           this.displayFaceBox(faceBox);
         } else {
           this.displayFaceBox({});
-          console.log('No face detected');
         }
 
-        // Update user entries count
+        // Update user entries
         fetch('https://smart-brain-backend-l6cv.onrender.com/image', {
           method: 'put',
           headers: { 'Content-Type': 'application/json' },
@@ -106,7 +106,7 @@ class App extends Component {
         })
           .then(res => res.json())
           .then(count => {
-            console.log('Updated entries:', count);
+            console.log('Updated entries count:', count);
             this.setState({ user: { ...this.state.user, entries: count } });
           })
           .catch(err => console.log('Entries update error:', err));
