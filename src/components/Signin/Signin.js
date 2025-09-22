@@ -22,7 +22,7 @@ class Signin extends Component {
     event.preventDefault(); // prevent page refresh
 
     fetch('https://smart-brain-backend-l6cv.onrender.com/signin', {
-      method: 'POST'
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: this.state.signInEmail,
