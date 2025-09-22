@@ -44,7 +44,7 @@ class App extends Component {
     });
   };
 
-  // Calculate face location with safety checks
+  // Calculate face location with safety check
   calculateFaceLocation = (data) => {
     if (
       !data.outputs ||
@@ -52,8 +52,9 @@ class App extends Component {
       !data.outputs[0].data.regions ||
       data.outputs[0].data.regions.length === 0
     ) {
-      return null; // No face detected
+      return null; // no face detected
     }
+
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
     const image = document.getElementById('inputimage');
 
@@ -87,27 +88,28 @@ class App extends Component {
     })
       .then(res => res.json())
       .then(response => {
-        if (response) {
-          // Detect face
-          const faceBox = this.calculateFaceLocation(response);
-          if (faceBox) {
-            this.displayFaceBox(faceBox);
-          } else {
-            this.displayFaceBox({});
-          }
-          
-          // Update user entries
-          fetch('https://smart-brain-backend-l6cv.onrender.com/image', {
-            method: 'put',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: this.state.user.id }),
-          })
-            .then(res => res.json())
-            .then(count => {
-              this.setState({ user: { ...this.state.user, entries: count } });
-            })
-            .catch(console.log);
+        console.log('API response:', response);
+        const faceBox = this.calculateFaceLocation(response);
+        console.log('Face box:', faceBox);
+        if (faceBox) {
+          this.displayFaceBox(faceBox);
+        } else {
+          this.displayFaceBox({});
+          console.log('No face detected');
         }
+
+        // Update user entries count
+        fetch('https://smart-brain-backend-l6cv.onrender.com/image', {
+          method: 'put',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: this.state.user.id }),
+        })
+          .then(res => res.json())
+          .then(count => {
+            console.log('Updated entries:', count);
+            this.setState({ user: { ...this.state.user, entries: count } });
+          })
+          .catch(err => console.log('Entries update error:', err));
       })
       .catch(err => {
         console.log('Error:', err);
