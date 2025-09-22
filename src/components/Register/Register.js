@@ -22,7 +22,7 @@ class Register extends React.Component {
     this.setState({ password: event.target.value });
   };
 
-  onSubmitSignIn = (event) => {
+  onSubmitRegister = (event) => {
     event.preventDefault(); // prevent page reload
     fetch('https://smart-brain-backend-l6cv.onrender.com/register', {
       method: 'POST',
@@ -53,7 +53,7 @@ class Register extends React.Component {
             <fieldset id="sign_up" className="ba b--transparent ph0 mh0">
               <legend className="f1 fw6 ph0 mh0">Register</legend>
               {/* Wrap inputs inside a form */}
-              <form onSubmit={this.onSubmitSignIn}>
+              <form onSubmit={this.onSubmitRegister}> {/* <-- fix here */}
                 <div className="mt3">
                   <label className="db fw6 lh-copy f6" htmlFor="name">Name</label>
                   <input
