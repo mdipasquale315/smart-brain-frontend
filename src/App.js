@@ -4,7 +4,6 @@ import ParticlesBg from "particles-bg";
 import 'tachyons';
 import { Logo } from "./components/Logo/Logo";
 import { Navigation } from "./components/Navigation/Navigation";
-import { ImageBox } from "./components/ImageBox/ImageBox";
 import { Entries } from "./components/Entries/Entries";
 import { FaceDetection } from "./components/FaceDetection/FaceDetection";
 import { SignIn } from "./components/SignIn/SignIn";
