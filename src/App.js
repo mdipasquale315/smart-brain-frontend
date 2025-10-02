@@ -5,8 +5,8 @@ import 'tachyons';
 import { Logo } from "./components/Logo/Logo";
 import { Navigation } from "./components/Navigation/Navigation";
 import { Rank } from "./components/Rank/Rank";
-import { FaceDetection } from "./components/FaceRecognition/FaceRecognition";
-import { SignIn } from "./components/SignIn/SignIn";
+import { FaceRecognition } from "./components/FaceRecognition/FaceRecognition";
+import { Signin } from "./components/Signin/Signin";
 import { Register } from "./components/Register/Register";
 
 const initialState = {
