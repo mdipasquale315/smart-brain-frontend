@@ -49,12 +49,27 @@ export default class App extends Component {
     }
 
     calculateFaceLocation = (data) => {
-        // console.log('Clarifai Model Response:', data);
+        console.log('Full API Response:', data);
+        
+        // Check if the response has an error
+        if (data.error) {
+            console.error('API Error:', data.error);
+            alert('Error: ' + data.error);
+            return null;
+        }
+        
+        // Check if regions exist and has at least one face
+        if (!data.data || !data.data.regions || data.data.regions.length === 0) {
+            console.log('No faces detected in image');
+            alert('No faces detected in this image');
+            return null;
+        }
+        
         const clarifaiFaceDetect = data.data.regions[0].region_info.bounding_box;
         const image = document.getElementById('inputimage');
         const imageWidth = Number(image.width);
         const imageHeight = Number(image.height);
-        // console.log(clarifaiFaceDetect, imageWidth, imageHeight)
+        
         return {
             topRow: clarifaiFaceDetect.top_row * imageHeight,
             leftCol: clarifaiFaceDetect.left_col * imageWidth,
@@ -64,7 +79,9 @@ export default class App extends Component {
     }
 
     displayFaceBox = (box) => {
-        this.setState({ box: box })
+        if (box) {
+            this.setState({ box: box })
+        }
     }
 
     onInputChange = (event) => {
@@ -83,24 +100,31 @@ export default class App extends Component {
             })
         })
             .then(response => response.json())
-            .then(result => this.displayFaceBox(this.calculateFaceLocation(result)))
-            .catch(err => console.log(err))
-
-        console.log('Fetching the Image... ')
-
-        fetch('https://face-detection-backend-one.onrender.com/image', {
-            method: 'put',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: this.state.user.id
+            .then(result => {
+                const box = this.calculateFaceLocation(result);
+                
+                if (box) {
+                    this.displayFaceBox(box);
+                    
+                    // Only increment count if face was detected
+                    fetch('https://face-detection-backend-one.onrender.com/image', {
+                        method: 'put',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id: this.state.user.id
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(count => {
+                            this.setState(Object.assign(this.state.user, { entries: count }))
+                        })
+                        .catch(err => console.log('Error updating count:', err))
+                }
             })
-        })
-            .then(response => response.json())
-            .then(count => {
-                // Object.assign doesn't creates a new object, it references to the original object!
-                this.setState(Object.assign(this.state.user, { entries: count }))
+            .catch(err => {
+                console.error('Fetch error:', err);
+                alert('Failed to process image. Please try again.');
             })
-            .catch(err => console.log(err))
     }
 
     render() {
