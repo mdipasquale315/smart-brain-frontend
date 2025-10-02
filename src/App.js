@@ -92,7 +92,7 @@ export default class App extends Component {
     onPictureSubmit = () => {
         this.setState({ imageUrl: this.state.input })
 
-        fetch('https://face-detection-backend-one.onrender.com/imageurl', {
+        fetch('https://smart-brain-backend-l6cv.onrender.com/imageurl', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
