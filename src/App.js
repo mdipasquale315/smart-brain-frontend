@@ -7,7 +7,7 @@ import { Navigation } from "./components/Navigation/Navigation";
 import { Entries } from "./components/Entries/Entries";
 import { FaceDetection } from "./components/FaceDetection/FaceDetection";
 import { SignIn } from "./components/SignIn/SignIn";
-import { SignUp } from "./components/SignUp/SignUp";
+import { Register } from "./components/Register/Register";
 
 const initialState = {
     input: '',
