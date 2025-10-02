@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import Particles from 'react-particles-js'; 
 import ParticlesBg from 'particles-bg'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Navigation from './components/Navigation/Navigation';
@@ -14,7 +13,7 @@ const initialState = {
     input: '',
     imageUrl: '',
     box: {},
-    route: 'sign-in',
+    route: 'signin',
     isSignedIn: false,
     user: {
         id: '',
@@ -44,21 +43,23 @@ export default class App extends Component {
     }
 
     onRouteChange = (route) => {
-        (route === 'sign-out') ? this.setState(initialState)
-            : this.setState({ route: route })
+        if (route === 'signout') {
+            this.setState(initialState)
+        } else if (route === 'home') {
+            this.setState({ isSignedIn: true })
+        }
+        this.setState({ route: route })
     }
 
     calculateFaceLocation = (data) => {
         console.log('Full API Response:', data);
         
-        // Check if the response has an error
         if (data.error) {
             console.error('API Error:', data.error);
             alert('Error: ' + data.error);
             return null;
         }
         
-        // Check if regions exist and has at least one face
         if (!data.data || !data.data.regions || data.data.regions.length === 0) {
             console.log('No faces detected in image');
             alert('No faces detected in this image');
@@ -86,10 +87,9 @@ export default class App extends Component {
 
     onInputChange = (event) => {
         this.setState({ input: event.target.value })
-        console.log('Image URL:', event.target.value);
     }
 
-    onPictureSubmit = () => {
+    onButtonSubmit = () => {
         this.setState({ imageUrl: this.state.input })
 
         fetch('https://smart-brain-backend-l6cv.onrender.com/imageurl', {
@@ -106,8 +106,7 @@ export default class App extends Component {
                 if (box) {
                     this.displayFaceBox(box);
                     
-                    // Only increment count if face was detected
-                    fetch('https://face-detection-backend-one.onrender.com/image', {
+                    fetch('https://smart-brain-backend-l6cv.onrender.com/image', {
                         method: 'put',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -128,29 +127,31 @@ export default class App extends Component {
     }
 
     render() {
-        const { imageUrl, box, route, isSignedIn } = this.state;
+        const { isSignedIn, imageUrl, route, box } = this.state;
         return (
             <div className="App">
-                <h1 className="red f3">Under Development!</h1>
-                <ParticlesBg type="lines" num={3} bg={true} />
-                <Navigation onRouteChange={this.onRouteChange} isSignedIn={isSignedIn}></Navigation>
-                <Logo onRouteChange={this.onRouteChange}></Logo>
-                {(route === 'face-detect') ?
-                    <div>
-                        <Entries name={this.state.user.name} entries={this.state.user.entries}></Entries>
-                        <ImageBox
+                <ParticlesBg type="cobweb" bg={true} />
+                <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+                <Logo />
+                { route === 'home'
+                    ? <div>
+                        <Rank
+                            name={this.state.user.name}
+                            entries={this.state.user.entries}
+                        />
+                        <ImageLinkForm
                             onInputChange={this.onInputChange}
-                            onPictureSubmit={this.onPictureSubmit}>
-                        </ImageBox>
-                        <FaceDetection imageUrl={imageUrl} box={box}></FaceDetection>
+                            onButtonSubmit={this.onButtonSubmit}
+                        />
+                        <FaceRecognition box={box} imageUrl={imageUrl} />
                     </div>
-                    : (route === 'sign-in') ?
-                        <SignIn onRouteChange={this.onRouteChange} loadUser={this.loadUser}></SignIn>
-                        : (route === 'sign-up') ?
-                            <SignUp onRouteChange={this.onRouteChange} loadUser={this.loadUser}></SignUp>
-                            : console.log('Routing Error Occoured...!')
+                    : (
+                        route === 'signin'
+                        ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+                        : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+                    )
                 }
             </div>
-        )
+        );
     }
 }
