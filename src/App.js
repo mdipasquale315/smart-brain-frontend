@@ -1,13 +1,14 @@
-import { Component } from "react";
+import React, { Component } from 'react';
+// import Particles from 'react-particles-js'; 
+import ParticlesBg from 'particles-bg'
+import FaceRecognition from './components/FaceRecognition/FaceRecognition';
+import Navigation from './components/Navigation/Navigation';
+import Signin from './components/Signin/Signin';
+import Register from './components/Register/Register';
+import Logo from './components/Logo/Logo';
+import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
+import Rank from './components/Rank/Rank';
 import './App.css';
-import ParticlesBg from "particles-bg";
-import 'tachyons';
-import { Logo } from "./components/Logo/Logo";
-import { Navigation } from "./components/Navigation/Navigation";
-import { Rank } from "./components/Rank/Rank";
-import { FaceRecognition } from "./components/FaceRecognition/FaceRecognition";
-import { Signin } from "./components/Signin/Signin";
-import { Register } from "./components/Register/Register";
 
 const initialState = {
     input: '',
